@@ -205,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements
 
         if (v == buttonCalcDistance){
             //This method will show the distance and will also draw the path.
-            //calculateDistance();
+            getDirection();
         }
     }
 
@@ -352,7 +352,7 @@ public class MapsActivity extends FragmentActivity implements
         Double distance = SphericalUtil.computeDistanceBetween(from, to);
 
         //Displaying the distance
-        Toast.makeText(this, String.valueOf(distance+" Meters"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.valueOf(distance+" Meters"), Toast.LENGTH_LONG).show();
 
         try{
             //Parsing json
