@@ -162,9 +162,9 @@ public class MapsActivity extends FragmentActivity implements
         Thing object = new Thing.Builder()
                 .setName("Maps Page") // TODO: Define a title for the content shown.
                 // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .setUrl(Uri.parse("http://host/path"))
                 .build();
-        return new Action.Builder(Action.TYPE_VIEW)
+        return new Action.Builder(Action.TYPE_VIEW) //TODO: choose an action type.
                 .setObject(object)
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
