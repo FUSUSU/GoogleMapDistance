@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -22,10 +23,34 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerDragListener,
         GoogleMap.OnMapLongClickListener,
-        View.OnClickListener{
+        View.OnClickListener
+{
 
-
+    //Our Map
     private GoogleMap mMap;
+
+    //To store longitude and latitude from map.
+    //Lưu trử kinh độ và vĩ độ từ bản đồ.
+    private double longitude;
+    private double latitude;
+
+    //From -> the first coordinate from where we need to calculate the distance
+    //Từ -> tọa độ đầu tiên từ nời chúng ta cần tính khoảng cách
+    private double fromLongitude;
+    private double fromLatitude;
+
+    //To -> the second coordinate to where we need to calculate the distance
+    //Đến -> tọa độ thứ hai đến nời chúng ta cần tính khoảng cách.
+    private double toLongitude;
+    private double toLatitude;
+
+    //Google ApiClient
+    private GoogleApiClient googleApiClient;
+
+    //Our buttons
+    private Button buttonSetTo; //button Vị trí đến
+    private Button buttonSetFrom; //button Vị trí đi
+    private Button buttonCalcDistance; //button tính khoảng cách
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
