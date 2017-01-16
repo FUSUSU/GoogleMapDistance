@@ -1,6 +1,8 @@
 package com.example.teo.googlemapdistance;
 
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Parcelable;
@@ -14,6 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -27,6 +35,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements
         OnMapReadyCallback,
@@ -285,5 +303,105 @@ public class MapsActivity extends FragmentActivity implements
         urlString.append("&sensor=false&mode=driving&alternatives=true");
         urlString.append("&key=AIzaSyCKshF9XI3Zfz2ksAmJdTKOe_n4EQO7C-4");
         return "";
+    }
+
+    //Phương hướng
+    private void getDirection(){
+        //Getting the URL
+        String url = makeURL(fromLatitude, fromLongitude, toLatitude, toLongitude);
+
+        //Show a dialog till we get the route.
+        //Hiển thị một hộp thoại cho đến khi chúng tôi nhận được đường.
+        final ProgressDialog loading = ProgressDialog.show(this, "Getting Route", "Please wait...", false, false);
+
+        //Creating a string request
+        //Tạo một yêu cầu chuổi
+        StringRequest stringRequest = new StringRequest(url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        loading.dismiss();
+                        //Calling the method drawPath to draw the path
+                        //Gọi phương thức drawPath để vẻ đường dẫn.
+                        drawPath(response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        loading.dismiss();
+                    }
+                });
+
+        //Adding the request to request queue
+        //Thêm một yêu cầu xếp hàng
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    //The parameter is the server response
+    //Các tham số là phản ứng của máy chủ.
+    private void drawPath(String result) {
+        //Getting both the coordinates.
+        //Bắt các tọa độ.
+        LatLng from = new LatLng(fromLatitude, fromLongitude);
+        LatLng to = new LatLng(toLatitude, toLongitude);
+
+        //Calculating the distance in meters.
+        //Tính khoảng cách bằng mét.
+        Double distance = SphericalUtil.computeDistanceBetween(from, to);
+
+        //Displaying the distance
+        Toast.makeText(this, String.valueOf(distance+" Meters"), Toast.LENGTH_SHORT).show();
+
+        try{
+            //Parsing json
+            final JSONObject json = new JSONObject(result);
+            JSONArray routeArray = json.getJSONArray("routes");
+            JSONObject routes = routeArray.getJSONObject(0);
+            JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
+            String encodedString = overviewPolylines.getString("points");
+            List<LatLng> list = decodePoly(encodedString);
+            Polyline line = mMap.addPolyline(new PolylineOptions()
+                            .addAll(list)
+                            .width(20)
+                            .color(Color.RED)
+                            .geodesic(true)
+            );
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<LatLng> decodePoly(String encoded) {
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+
+        while (index < len){
+            int b, shift = 0, result = 0;
+            do{
+                b = encoded.charAt(index++) -63;
+                result |= (b & 0x1f) << shift;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~ (result >> 1) : (result >> 1));
+            lat += dlat;
+
+            shift = 0;
+            result = 0;
+
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+            } while (b >= 0x20);
+            int dlng = ((result & 1) != 0 ? ~ (result >> 1) : (result >> 1));
+            lng += dlng;
+
+            LatLng p = new LatLng( (((double)lat / 1E5)),
+                        (((double)lng / 1E5) ));
+            poly.add(p);
+        }
+        return poly;
     }
 }
