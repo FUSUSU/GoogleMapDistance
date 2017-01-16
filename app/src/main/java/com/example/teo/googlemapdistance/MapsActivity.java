@@ -214,9 +214,16 @@ public class MapsActivity extends FragmentActivity implements
     public void onMarkerDrag(Marker marker) {
 
     }
-
+        
     @Override
     public void onMarkerDragEnd(Marker marker) {
+        //Getting the coordinates
+        //Lấy tọa độ
+        latitude = marker.getPosition().latitude;
+        longitude = marker.getPosition().longitude;
+
+        //Moving the map
+        moveMap();
 
     }
 
