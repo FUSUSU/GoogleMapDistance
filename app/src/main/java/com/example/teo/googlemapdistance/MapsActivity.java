@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.renderscript.Double2;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -171,7 +173,22 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onClick(View v) {
+        if (v == buttonSetFrom){
+            fromLatitude = latitude;
+            fromLongitude = longitude;
+            Toast.makeText(this, "From set", Toast.LENGTH_SHORT).show();
+        }
 
+        if (v == buttonSetTo){
+            toLatitude = latitude;
+            toLongitude = longitude;
+            Toast.makeText(this, "To set", Toast.LENGTH_SHORT).show();
+        }
+
+        if (v == buttonCalcDistance){
+            //This method will show the distance and will also draw the path.
+            //calculateDistance();
+        }
     }
 
     @Override
@@ -214,7 +231,7 @@ public class MapsActivity extends FragmentActivity implements
     public void onMarkerDrag(Marker marker) {
 
     }
-        
+
     @Override
     public void onMarkerDragEnd(Marker marker) {
         //Getting the coordinates
@@ -251,5 +268,22 @@ public class MapsActivity extends FragmentActivity implements
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(googleApiClient, getIndexApiAction());
         googleApiClient.disconnect();
+    }
+
+    //Tìm đường dẫn.
+    public String makeURL(double sourcelat, double sourcelog, double deslat, double destlog){
+        StringBuilder urlString = new StringBuilder();
+        urlString.append("https://maps.googleapis.com/maps/api/direction/json");
+        urlString.append("?origin="); //from
+        urlString.append(Double.toString(sourcelat));
+        urlString.append(",");
+        urlString.append(Double.toString(sourcelog));
+        urlString.append("&destination="); // to
+        urlString.append(Double.toString(sourcelat));
+        urlString.append(",");
+        urlString.append(Double.toString(sourcelog));
+        urlString.append("&sensor=false&mode=driving&alternatives=true");
+        urlString.append("&key=AIzaSyCKshF9XI3Zfz2ksAmJdTKOe_n4EQO7C-4");
+        return "";
     }
 }
