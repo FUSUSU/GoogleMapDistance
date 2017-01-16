@@ -176,7 +176,7 @@ public class MapsActivity extends FragmentActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
+        getCurrentLocation();
     }
 
     @Override
