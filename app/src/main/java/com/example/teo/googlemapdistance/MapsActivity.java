@@ -189,9 +189,20 @@ public class MapsActivity extends FragmentActivity implements
 
     }
 
+    //Click nhấn giữ lâu để lấy vị trí mới hiện tại đang nhấn.
     @Override
     public void onMapLongClick(LatLng latLng) {
+        //Clearing all the marker
+        //Xóa tất cả các đánh dấu.
+        mMap.clear();
+        //Adding a new marker to the current pressed position.
+        //Thêm mời một đánh dấu ép lại vị trí hiện tại
+        mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .draggable(true));
 
+        latitude = latLng.latitude;
+        longitude = latLng.longitude;
     }
 
     @Override
