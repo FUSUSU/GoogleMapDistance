@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,6 +62,25 @@ public class MapsActivity extends FragmentActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        //Initializing googleapi client
+        // ATTENTION: this "addApi (AppIndex.API)" was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .addApi(AppIndex.API).build();
+
+        //Ánh xạ
+        buttonSetTo = (Button) findViewById(R.id.buttonSetTo);
+        buttonSetFrom = (Button) findViewById(R.id.buttonSetFrom);
+        buttonCalcDistance = (Button) findViewById(R.id.buttonCalcDistance);
+
+        //Gắn ống nghe cho button
+        buttonSetTo.setOnClickListener(this);
+        buttonSetFrom.setOnClickListener(this);
+        buttonCalcDistance.setOnClickListener(this);
     }
 
 
