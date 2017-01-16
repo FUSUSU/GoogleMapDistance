@@ -1,8 +1,12 @@
 package com.example.teo.googlemapdistance;
 
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -28,8 +32,7 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerDragListener,
         GoogleMap.OnMapLongClickListener,
-        View.OnClickListener
-{
+        View.OnClickListener {
 
     //Our Map
     private GoogleMap mMap;
@@ -109,9 +112,61 @@ public class MapsActivity extends FragmentActivity implements
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
+        // Thêm đánh dấu Sydney và di chuyển camera.
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.addMarker(new MarkerOptions().position(sydney).draggable(true)); //kéo.
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney")); //Tiêu đề.
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney)); //di chuyển camera.
+        mMap.setOnMarkerDragListener(this); //Gắn bộ nghe đánh dấu cho map
+        mMap.setOnMapLongClickListener(this); //Gắn bộ nghe LongClick - nhấn giữ lâu cho map
+    }
+
+    //Getting current location
+    //Nhận vị trí hiện tại
+    private void getCurrentLocation() {
+        mMap.clear();
+        //Creating a location object
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if (location != null) {
+            //Getting longitude and latitude
+            //Lấy kinh độ và vĩ độ
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+
+            //moving the map to location
+            moveMap();
+        }
+
+    }
+
+    //Function to move the map
+    private void moveMap(){
+        //Creating a LatLng object to store Coordinates.
+        //Tạo một một đối tượng LatLng để lưu trữ tạo độ.
+        LatLng latLng = new LatLng(latitude, longitude);
+
+        //Adding marker to map
+        //Thêm đánh dấu bản đồ.
+        mMap.addMarker(new MarkerOptions()
+            .position(latLng) //Setting position //Cài đặt vị trí
+            .draggable(true) //Making the marker draggable
+            .title("Current Location")); //Adding a title // Thêm một tiêu đề.
+
+        //Moving the camera
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        //Animating the camera
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 
     @Override
